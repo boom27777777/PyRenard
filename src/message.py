@@ -1,7 +1,7 @@
 import traceback
 
 
-def process(line, ircBot):
+def process(line, irc_bot):
     try:
         line.rstrip()
         args = line.split()
@@ -9,10 +9,10 @@ def process(line, ircBot):
         typ = args[1]
         channel = args[2]
         message = line.rstrip().split(':')[2]
-        ircBot.PLUGINMANAGER.runPlugins(typ, channel,  user, message)
+        irc_bot.plugin_manager.run_plugins(typ, channel,  user, message)
 
-        loggerExists, logger = ircBot.getLogger(channel)
-        if loggerExists:
+        logger_exists, logger = irc_bot.get_logger(channel)
+        if logger_exists:
             logger.log(channel, user['Nick'], message)
     except:
         trace = traceback.format_exc()

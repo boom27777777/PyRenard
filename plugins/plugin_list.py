@@ -9,12 +9,12 @@ class plugin():
                '3. "!plugin reload" || Reloads all plugins']
         return {'type': 'privmsglist', 'target': channel, 'list': hlp}
 
-    def run(self, typ, channel, sender, message, ircBot):
+    def run(self, typ, channel, sender, message, irc_bot):
         if message is not None:
-            if ircBot.isOwner(sender['Nick']):
+            if irc_bot.is_owner(sender['Nick']):
                 if not message.find('!plugin') == - 1:
                     if not message.find('list') == - 1:
-                        lst = ircBot.PLUGINMANAGER.getPlugins()
+                        lst = irc_bot.plugin_manager.get_plugins()
                         outstr = ''
                         for x in lst:
                             if x['enabled']:
@@ -22,23 +22,27 @@ class plugin():
                             else:
                                 status = 'Disabled'
                             outstr = outstr + x['name'] + ': ' + status + ', '
-                        return True, {'type': 'privmsg', 'target': channel, 'message': outstr}
+                        return True, {'type': 'irc_privmsg', 'target': channel, 'message': outstr}
 
                     if not message.find('enable') == -1 or not message.find('disable') == -1:
                         args = message.split()
-                        lst = ircBot.PLUGINMANAGER.getPlugins()
+                        lst = irc_bot.plugin_manager.get_plugins()
                         for x in lst:
                             if args[2] == x['name']:
                                 if args[1] == "enable":
                                     x['enabled'] = True
-                                    return True, {'type': 'privmsg', 'target': channel, 'message': x['name'] + ' Enabled!'}
+                                    return True, {'type': 'irc_privmsg', 'target': channel, 'message': x['name'] +
+                                                  ' Enabled!'}
                                 if args[1] == "disable":
                                     x['enabled'] = False
-                                    return True, {'type': 'privmsg', 'target': channel, 'message': x['name'] + ' Disabled!'}
+                                    return True, {'type': 'irc_privmsg', 'target': channel, 'message': x['name'] +
+                                                  ' Disabled!'}
 
                     if not message.find('reload') == -1:
                         print('reloading plugins. Ordered by ' + sender['Nick'])
-                        ircBot.PLUGINMANAGER.loadPlugins()
-                        return True, {'type': 'privmsg', 'target': channel, 'message': 'Plugins reloaded!'}
+                        irc_bot.plugin_manager.load_plugins()
+                        return True, {'type': 'irc_privmsg', 'target': channel, 'message': 'Plugins reloaded!'}
 
                 return False, {}
+
+            return False, {}

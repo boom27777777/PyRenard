@@ -4,12 +4,12 @@ import traceback
 
 
 class PluginManager:
-    def __init__(self, ircBot):
-        self.ATTACHED = ircBot
-        self.PLUGINS = []
+    def __init__(self, irc_bot):
+        self.attached = irc_bot
+        self.plugins = []
 
-    def loadPlugins(self):
-        self.PLUGINS = None
+    def load_plugins(self):
+        self.plugins = None
         pl = []
         lst = os.listdir('plugins')
         pls = []
@@ -26,31 +26,32 @@ class PluginManager:
                 pl.append({'name': f, 'plugin': obj, 'enabled': True, 'callbacks': obj.callback()})
                 print("loaded plugin " + f)
             except AttributeError:
-                print("!!!Failed to load plugin " + f)
+                print("!!!Failed to load plugin " + f + "!!!")
                 trace = traceback.format_exc()
-                e, logger = self.ATTACHED.getLogger('Error')
+                e, logger = self.attached.get_logger('Error')
                 logger.log('PluginManager', '', trace)
                 print(trace)
-        self.PLUGINS = pl
+        self.plugins = pl
 
-    def runPlugins(self, typ, channel, sender, message):
-        global pl
+    def run_plugins(self, typ, channel, sender, message):
+        current_plugin = None
         try:
-            for pl in self.PLUGINS:
+            for pl in self.plugins:
+                current_plugin = pl
                 if pl['enabled'] and pl['callbacks']['type'] == typ:
-                    status, results = pl['plugin'].run(typ, channel, sender, message, self.ATTACHED)
+                    status, results = pl['plugin'].run(typ, channel, sender, message, self.attached)
                     if status:
-                        if (results['type'] == 'privmsg'):
-                            self.ATTACHED.addToQueue(irc.pRIVMSG(results['target'],
-                                                                 results['message']))
+                        if (results['type'] == 'irc_privmsg'):
+                            self.attached.add_to_queue(irc.irc_privmsg(results['target'],
+                                                       results['message']))
                         if (results['type'] == 'privmsglist'):
                             for x in results['list']:
-                                self.ATTACHED.addToQueue(irc.pRIVMSG(results['target'], x))
+                                self.attached.add_to_queue(irc.irc_privmsg(results['target'], x))
         except:
             trace = traceback.format_exc()
-            print("!!!Error raised in Plugin: " + pl['name'] + "\r\n" + trace)
-            e, logger = self.ATTACHED.getLogger('Error')
-            logger.log('PluginManager', pl['name'], trace)
+            print("!!!Error raised in Plugin: " + current_plugin['name'] + "!!!\r\n" + trace)
+            e, logger = self.attached.get_logger('Error')
+            logger.log('PluginManager', current_plugin['name'], trace)
 
-    def getPlugins(self):
-        return self.PLUGINS
+    def get_plugins(self):
+        return self.plugins
