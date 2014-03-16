@@ -13,7 +13,7 @@ class loadPrefs:
             try:
                 args[0] = str(args[0]).replace('host=', '').rstrip()
                 args[1] = int(str(args[1].replace('port=', '').rstrip()))
-                args[2] = str(args[2]).replace('nick=', '').rstrip()
+                args[2] = str(args[2]).replace('irc_nick=', '').rstrip()
                 args[3] = str(args[3]).replace('username=', '').rstrip()
                 args[4] = str(args[4]).replace('ident=', '').rstrip()
                 args[5] = str(args[5]).replace('realname=', '').rstrip()
@@ -25,31 +25,31 @@ class loadPrefs:
                 return []
         except (IOError):
             conf = open('settings.conf', 'wb')
-            conf.write(bytes('host=\nport=\nnick=\nusername=\nident=\nrealname=\nowners=\nchanlist='))
+            conf.write(bytes('host=\nport=\nirc_nick=\nusername=\nident=\nrealname=\nowners=\nchanlist='))
             raise SettingsFileNotFoundError
 
 
 class Logger():
-    def __init__(self, name, logFile):
-        self.NAME = name
-        self.LOGFILE = logFile
+    def __init__(self, name, log_file):
+        self.name = name
+        self.logfile = log_file
 
     def log(self, channel, sender, message):
         outstr = bytes('[{0}][{1}] {2}: {3}\r\n'.format(time.asctime(time.localtime()), channel, sender, message))
         try:
-            f = open(self.LOGFILE, 'ab')
+            f = open(self.logfile, 'ab')
             f.write(outstr)
             f.close()
         except IOError:
-            f = open(self.LOGFILE, 'wb')
+            f = open(self.logfile, 'wb')
             f.write(outstr)
             f.close()
 
-    def getTarget(self):
-        return self.LOGFILE
+    def get_target(self):
+        return self.logfile
 
-    def getName(self):
-        return self.NAME
+    def get_name(self):
+        return self.name
 
 
 class SettingsFileNotFoundError(BaseException):
