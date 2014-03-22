@@ -8,7 +8,15 @@ def process(line, irc_bot):
         user = {"Ident": args[0], "Nick": args[0].split('!')[0].replace(":", "")}
         typ = args[1]
         channel = args[2]
-        message = line.rstrip().split(':')[2]
+        if typ == "PRIVMSG":
+            if 'ACTION' in line:
+                typ = 'ACTION'
+                message = line.rstrip().split(channel + ' :')[1]
+            else:
+                message = line.rstrip().split(channel + ' :')[1]
+        else:
+            message = line.rstrip().split(':')[2]
+
         irc_bot.plugin_manager.run_plugins(typ, channel,  user, message)
 
         logger_exists, logger = irc_bot.get_logger(channel)

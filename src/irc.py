@@ -3,7 +3,7 @@ def irc_nick(new_nick):
 
 
 def irc_user(user_name, ident, real_name):
-    return 'USER {0} 0 {1} : {2}\r\n'.format(user_name, ident, real_name)
+    return 'USER {0} 0 {1} :{2}\r\n'.format(user_name, ident, real_name)
 
 
 def irc_pong(challenge):
@@ -11,7 +11,7 @@ def irc_pong(challenge):
 
 
 def irc_join(channel):
-    return 'JOIN {0}\r\n'.format(channel)
+    return 'JOIN :{0}\r\n'.format(channel)
 
 
 def irc_part(channel, reason=''):

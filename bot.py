@@ -5,16 +5,21 @@ from src import irc, file, message, plugin_manager
 
 
 class IRCBot:
-    def __init__(self, host, port, nick, username, ident, realname, owners,
-                 chanlist):
+    def __init__(self, host='localhost', port='6667', nick='Renard', username='Renard', ident='Renard.is.back',
+                 realname='Renard Queenston', owners=None, chanlist=None, ssl=False, **kwargs):
+        if not owners:
+            owners = []
+        if not isinstance(chanlist, list):
+            chanlist = [chanlist]
         self.host = host
-        self.port = port
+        self.port = int(port)
         self.nick = nick
         self.username = username
         self.ident = ident
         self.realname = realname
         self.owner = owners
         self.chanlist = chanlist
+        self.settings = kwargs
         self.active = True
         self.identified = False
         self.error = 'I feel a disturbance in the force.'
@@ -45,8 +50,8 @@ class IRCBot:
             self.active = False
             try:
                 self.threadpool.terminate()
-            except:
-                pass
+            except KeyboardInterrupt:
+                e = ''
 
     def listen(self, sock):
         line = sock.recv(2048)
@@ -97,7 +102,7 @@ class IRCBot:
 
     def get_logger(self, name):
         for logger in self.logger:
-            if (logger.get_name() == name):
+            if (logger.get_name().lower() == name):
                 return True, logger
         return False, None
 
@@ -121,10 +126,9 @@ class IRCBot:
         return False
 
 try:
-    args = file.loadPrefs('loader').load()
+    settings = file.LoadPrefs('loader').load()
     try:
-        t = IRCBot(args[0], args[1], args[2], args[3], args[4], args[5],
-                   args[6], args[7])
+        t = IRCBot(**settings)
     except IndexError:
         pass
 except file.SettingsFileNotFoundError:
